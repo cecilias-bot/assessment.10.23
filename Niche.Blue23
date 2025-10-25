@@ -1,0 +1,846 @@
+import React, { useState } from 'react';
+import { ChevronRight, Mail, BarChart3, Sparkles, Globe } from 'lucide-react';
+
+const NicheBlueprintAssessment = () => {
+  const [screen, setScreen] = useState('welcome');
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [email, setEmail] = useState('');
+  const [archetype, setArchetype] = useState(null);
+  const [scores, setScores] = useState(null);
+  const [language, setLanguage] = useState('en');
+  const [optionalAnswers, setOptionalAnswers] = useState({});
+
+  const content = {
+    en: {
+      welcome: {
+        badge: 'NICHE BLUEPRINT™',
+        title: 'Discover Your Founder-Market Fit',
+        subtitle: 'A science-backed assessment to reveal how well your skills, experience, personality, and interests align with your business direction.',
+        whatYouGet: "What You'll Get:",
+        benefits: [
+          'Your personal FMF Score (0-100)',
+          'Your unique Founder Archetype (1 of 9)',
+          'Personalized insights on strengths & growth areas'
+        ],
+        time: 'Takes about 5 minutes · 24 questions',
+        cta: 'Start Your Assessment'
+      },
+      sections: {
+        skill: '💡 Skill',
+        experience: '⚙️ Experience',
+        personality: '💬 Personality',
+        interest: '🔥 Interest'
+      },
+      scale: ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'],
+      results: {
+        youAre: "You're The",
+        score: 'FMF Score',
+        strengths: '💪 Your Strengths',
+        growth: '🎯 Growth Areas',
+        breakdown: 'Your FMF Breakdown',
+        emailTitle: 'Get Your Full Niche Blueprint™ Report',
+        emailSubtitle: 'Receive detailed insights, action steps, and personalized recommendations based on your archetype.',
+        emailPlaceholder: 'Enter your email',
+        emailCta: 'Submit & Get My Report',
+        privacy: 'We respect your privacy. Unsubscribe anytime.'
+      },
+      progressOf: 'of',
+      optional: {
+        title: 'One More Thing...',
+        subtitle: 'These optional questions help us personalize your insights even further. Feel free to skip any!',
+        skip: 'Skip & See Results',
+        continue: 'Continue',
+        questions: {
+          industry: {
+            label: 'What industry or niche are you building in?',
+            placeholder: 'e.g., Health & Wellness, Tech/SaaS, Creative Services...'
+          },
+          challenge: {
+            label: 'What\'s your biggest challenge right now?',
+            options: [
+              'Finding my niche',
+              'Building an audience',
+              'Creating consistent content',
+              'Monetization strategy',
+              'Time management',
+              'Confidence & imposter syndrome',
+              'Technical skills',
+              'Other'
+            ]
+          },
+          timeline: {
+            label: 'What\'s your goal timeline?',
+            options: [
+              'Next 3 months - Quick wins',
+              'Next 6 months - Building momentum',
+              'Next year - Long-term foundation',
+              'Just exploring for now'
+            ]
+          },
+          stage: {
+            label: 'Where are you in your journey?',
+            options: [
+              'Just starting - Idea phase',
+              'Building - Creating my first offers',
+              'Growing - Have some traction',
+              'Scaling - Ready to expand',
+              'Pivoting - Changing direction'
+            ]
+          }
+        }
+      }
+    },
+    es: {
+      welcome: {
+        badge: 'NICHE BLUEPRINT™',
+        title: 'Descubre tu Ajuste Fundador-Mercado',
+        subtitle: 'Una evaluación respaldada por ciencia para revelar qué tan bien tus habilidades, experiencia, personalidad e intereses se alinean con tu dirección empresarial.',
+        whatYouGet: 'Lo que obtendrás:',
+        benefits: [
+          'Tu Puntuación FMF personal (0-100)',
+          'Tu Arquetipo de Fundador único (1 de 9)',
+          'Insights personalizados sobre fortalezas y áreas de crecimiento'
+        ],
+        time: 'Toma unos 5 minutos · 24 preguntas',
+        cta: 'Comenzar la Evaluación'
+      },
+      sections: {
+        skill: '💡 Habilidad',
+        experience: '⚙️ Experiencia',
+        personality: '💬 Personalidad',
+        interest: '🔥 Interés'
+      },
+      scale: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
+      results: {
+        youAre: 'Eres El/La',
+        score: 'Puntuación FMF',
+        strengths: '💪 Tus Fortalezas',
+        growth: '🎯 Áreas de Crecimiento',
+        breakdown: 'Tu Desglose FMF',
+        emailTitle: 'Obtén tu Reporte Niche Blueprint™ Completo',
+        emailSubtitle: 'Recibe insights detallados, pasos de acción y recomendaciones personalizadas basadas en tu arquetipo.',
+        emailPlaceholder: 'Ingresa tu correo electrónico',
+        emailCta: 'Enviar y Obtener Mi Reporte',
+        privacy: 'Respetamos tu privacidad. Cancela en cualquier momento.'
+      },
+      progressOf: 'de',
+      optional: {
+        title: 'Una Cosa Más...',
+        subtitle: '¡Estas preguntas opcionales nos ayudan a personalizar aún más tus insights. Puedes omitir las que quieras!',
+        skip: 'Omitir y Ver Resultados',
+        continue: 'Continuar',
+        questions: {
+          industry: {
+            label: '¿En qué industria o nicho estás construyendo?',
+            placeholder: 'ej., Salud y Bienestar, Tech/SaaS, Servicios Creativos...'
+          },
+          challenge: {
+            label: '¿Cuál es tu mayor desafío en este momento?',
+            options: [
+              'Encontrar mi nicho',
+              'Construir una audiencia',
+              'Crear contenido consistente',
+              'Estrategia de monetización',
+              'Gestión del tiempo',
+              'Confianza y síndrome del impostor',
+              'Habilidades técnicas',
+              'Otro'
+            ]
+          },
+          timeline: {
+            label: '¿Cuál es tu línea de tiempo objetivo?',
+            options: [
+              'Próximos 3 meses - Resultados rápidos',
+              'Próximos 6 meses - Construyendo momentum',
+              'Próximo año - Base a largo plazo',
+              'Solo explorando por ahora'
+            ]
+          },
+          stage: {
+            label: '¿Dónde estás en tu jornada?',
+            options: [
+              'Recién comenzando - Fase de idea',
+              'Construyendo - Creando mis primeras ofertas',
+              'Creciendo - Tengo algo de tracción',
+              'Escalando - Listo/a para expandir',
+              'Pivoteando - Cambiando dirección'
+            ]
+          }
+        }
+      }
+    }
+  };
+
+  const questions = {
+    en: [
+      { id: 0, section: 'skill', text: 'I can clearly explain what I do or want to create.', reverse: false },
+      { id: 1, section: 'skill', text: "I've developed skills that others would pay for.", reverse: false },
+      { id: 2, section: 'skill', text: 'I can deliver results without needing much guidance.', reverse: false },
+      { id: 3, section: 'skill', text: 'I know which strengths make me stand out.', reverse: false },
+      { id: 4, section: 'skill', text: "I've created something I'm proud to share.", reverse: false },
+      { id: 5, section: 'skill', text: 'I often doubt that my current skills are enough.', reverse: true },
+      { id: 6, section: 'experience', text: "I've shared or published work related to my topic.", reverse: false },
+      { id: 7, section: 'experience', text: "I've been active in my field for six months or more.", reverse: false },
+      { id: 8, section: 'experience', text: "I've received feedback or engagement from others.", reverse: false },
+      { id: 9, section: 'experience', text: 'I can show examples that demonstrate progress.', reverse: false },
+      { id: 10, section: 'experience', text: 'I apply what I learn in real projects.', reverse: false },
+      { id: 11, section: 'experience', text: "I start new projects but don't finish them.", reverse: true },
+      { id: 12, section: 'personality', text: 'I feel energized when sharing ideas publicly.', reverse: false },
+      { id: 13, section: 'personality', text: 'I like structure and plans before creating.', reverse: false },
+      { id: 14, section: 'personality', text: 'I stay consistent even when not inspired.', reverse: false },
+      { id: 15, section: 'personality', text: 'I adapt easily when plans change.', reverse: false },
+      { id: 16, section: 'personality', text: 'I balance creativity with organization.', reverse: false },
+      { id: 17, section: 'personality', text: 'I struggle to focus when unmotivated.', reverse: true },
+      { id: 18, section: 'interest', text: 'I research my topic just for fun.', reverse: false },
+      { id: 19, section: 'interest', text: 'I can see myself exploring this for years.', reverse: false },
+      { id: 20, section: 'interest', text: 'I stay motivated even when progress is slow.', reverse: false },
+      { id: 21, section: 'interest', text: 'I constantly think about new ideas for my niche.', reverse: false },
+      { id: 22, section: 'interest', text: 'I feel connected to the purpose behind what I do.', reverse: false },
+      { id: 23, section: 'interest', text: 'My interest fades when growth slows.', reverse: true },
+    ],
+    es: [
+      { id: 0, section: 'skill', text: 'Puedo explicar claramente lo que hago o quiero crear.', reverse: false },
+      { id: 1, section: 'skill', text: 'He desarrollado habilidades por las que otros pagarían.', reverse: false },
+      { id: 2, section: 'skill', text: 'Puedo entregar resultados sin necesitar mucha orientación.', reverse: false },
+      { id: 3, section: 'skill', text: 'Sé qué fortalezas me hacen destacar.', reverse: false },
+      { id: 4, section: 'skill', text: 'He creado algo de lo que estoy orgulloso/a de compartir.', reverse: false },
+      { id: 5, section: 'skill', text: 'A menudo dudo que mis habilidades actuales sean suficientes.', reverse: true },
+      { id: 6, section: 'experience', text: 'He compartido o publicado trabajo relacionado con mi tema.', reverse: false },
+      { id: 7, section: 'experience', text: 'He estado activo/a en mi campo por seis meses o más.', reverse: false },
+      { id: 8, section: 'experience', text: 'He recibido retroalimentación o interacción de otros.', reverse: false },
+      { id: 9, section: 'experience', text: 'Puedo mostrar ejemplos que demuestran progreso.', reverse: false },
+      { id: 10, section: 'experience', text: 'Aplico lo que aprendo en proyectos reales.', reverse: false },
+      { id: 11, section: 'experience', text: 'Inicio nuevos proyectos pero no los termino.', reverse: true },
+      { id: 12, section: 'personality', text: 'Me siento energizado/a al compartir ideas públicamente.', reverse: false },
+      { id: 13, section: 'personality', text: 'Me gusta tener estructura y planes antes de crear.', reverse: false },
+      { id: 14, section: 'personality', text: 'Me mantengo consistente incluso cuando no estoy inspirado/a.', reverse: false },
+      { id: 15, section: 'personality', text: 'Me adapto fácilmente cuando los planes cambian.', reverse: false },
+      { id: 16, section: 'personality', text: 'Equilibro la creatividad con la organización.', reverse: false },
+      { id: 17, section: 'personality', text: 'Me cuesta enfocarme cuando no estoy motivado/a.', reverse: true },
+      { id: 18, section: 'interest', text: 'Investigo mi tema solo por diversión.', reverse: false },
+      { id: 19, section: 'interest', text: 'Puedo verme explorando esto durante años.', reverse: false },
+      { id: 20, section: 'interest', text: 'Me mantengo motivado/a incluso cuando el progreso es lento.', reverse: false },
+      { id: 21, section: 'interest', text: 'Constantemente pienso en nuevas ideas para mi nicho.', reverse: false },
+      { id: 22, section: 'interest', text: 'Me siento conectado/a con el propósito detrás de lo que hago.', reverse: false },
+      { id: 23, section: 'interest', text: 'Mi interés disminuye cuando el crecimiento se ralentiza.', reverse: true },
+    ]
+  };
+
+  const archetypes = {
+    en: {
+      'Aligned Founder': {
+        emoji: '🔥',
+        title: 'Aligned Founder',
+        color: 'from-red-500 to-orange-500',
+        message: "You're in full alignment — your skills, experience, personality, and passion are firing on all cylinders. You're ready to lead, mentor, and build your legacy.",
+        strengths: 'Complete alignment across all dimensions',
+        growth: 'Focus on scale, delegation, and legacy building'
+      },
+      'Visionary': {
+        emoji: '❤️',
+        title: 'Visionary',
+        color: 'from-pink-500 to-red-500',
+        message: "You're purpose-driven and inspiring. Your vision is clear and your skills are strong. Now it's time to refine your message and step into leadership.",
+        strengths: 'Strong vision, high capability, deep motivation',
+        growth: 'Build more consistent proof and audience engagement'
+      },
+      'Expert': {
+        emoji: '💎',
+        title: 'Expert',
+        color: 'from-blue-500 to-purple-500',
+        message: "You're credible and confident with proven experience. You're ready to teach, mentor, or scale your expertise into something bigger.",
+        strengths: 'Deep expertise, proven track record, confidence',
+        growth: 'Expand your reach and package your knowledge'
+      },
+      'Strategist': {
+        emoji: '💜',
+        title: 'Strategist',
+        color: 'from-purple-500 to-indigo-500',
+        message: "You're experienced and structured. You've built consistency and proof. Balance your logic with creative flow to unlock the next level.",
+        strengths: 'Strong experience, systematic approach',
+        growth: 'Infuse more creativity and personality into your work'
+      },
+      'Artisan': {
+        emoji: '💗',
+        title: 'Artisan',
+        color: 'from-pink-400 to-rose-400',
+        message: "You're talented and expressive with strong skills. Now it's time to systemize your craft so you can scale without burning out.",
+        strengths: 'High skill level, creative expression',
+        growth: 'Build systems, consistency, and sustainable processes'
+      },
+      'Builder': {
+        emoji: '💚',
+        title: 'Builder',
+        color: 'from-green-500 to-teal-500',
+        message: "You're skilled and driven with clear direction. Consistency will be your superpower — keep showing up and results will compound.",
+        strengths: 'Strong skills, clear motivation',
+        growth: 'Build consistent habits and track your progress'
+      },
+      'Dreamer': {
+        emoji: '🩵',
+        title: 'Dreamer',
+        color: 'from-cyan-400 to-blue-400',
+        message: "You're full of passion and ideas. Now it's time to turn that inspiration into structure. Start small, build skills, and create proof.",
+        strengths: 'High motivation, passionate about your topic',
+        growth: 'Develop specific skills and create tangible outputs'
+      },
+      'Seeker': {
+        emoji: '🧡',
+        title: 'Seeker',
+        color: 'from-orange-400 to-amber-400',
+        message: "You're expressive and creative with great energy. Your focus will bring clarity — choose one direction and build momentum there.",
+        strengths: 'Strong personality, creative energy',
+        growth: 'Focus your energy and develop core skills'
+      },
+      'Explorer': {
+        emoji: '💛',
+        title: 'Explorer',
+        color: 'from-yellow-400 to-amber-400',
+        message: "You're curious and experimental, trying different paths. Clarity comes through creation — pick something and go deep for 90 days.",
+        strengths: 'Open-minded, willing to experiment',
+        growth: 'Commit to one path and build depth over breadth'
+      }
+    },
+    es: {
+      'Aligned Founder': {
+        emoji: '🔥',
+        title: 'Fundador/a Alineado/a',
+        color: 'from-red-500 to-orange-500',
+        message: 'Estás en completa alineación — tus habilidades, experiencia, personalidad y pasión están funcionando a pleno. Estás listo/a para liderar, mentorear y construir tu legado.',
+        strengths: 'Alineación completa en todas las dimensiones',
+        growth: 'Enfócate en escalar, delegar y construir legado'
+      },
+      'Visionary': {
+        emoji: '❤️',
+        title: 'Visionario/a',
+        color: 'from-pink-500 to-red-500',
+        message: 'Estás impulsado/a por un propósito e inspiras a otros. Tu visión es clara y tus habilidades son fuertes. Es momento de refinar tu mensaje y asumir el liderazgo.',
+        strengths: 'Visión fuerte, alta capacidad, motivación profunda',
+        growth: 'Construye más pruebas consistentes e interacción con la audiencia'
+      },
+      'Expert': {
+        emoji: '💎',
+        title: 'Experto/a',
+        color: 'from-blue-500 to-purple-500',
+        message: 'Eres creíble y seguro/a con experiencia comprobada. Estás listo/a para enseñar, mentorear o escalar tu expertise a algo más grande.',
+        strengths: 'Experiencia profunda, trayectoria comprobada, confianza',
+        growth: 'Expande tu alcance y empaqueta tu conocimiento'
+      },
+      'Strategist': {
+        emoji: '💜',
+        title: 'Estratega',
+        color: 'from-purple-500 to-indigo-500',
+        message: 'Eres experimentado/a y estructurado/a. Has construido consistencia y prueba. Balancea tu lógica con flujo creativo para desbloquear el siguiente nivel.',
+        strengths: 'Experiencia fuerte, enfoque sistemático',
+        growth: 'Infunde más creatividad y personalidad en tu trabajo'
+      },
+      'Artisan': {
+        emoji: '💗',
+        title: 'Artesano/a',
+        color: 'from-pink-400 to-rose-400',
+        message: 'Eres talentoso/a y expresivo/a con habilidades fuertes. Es momento de sistematizar tu oficio para poder escalar sin agotarte.',
+        strengths: 'Alto nivel de habilidad, expresión creativa',
+        growth: 'Construye sistemas, consistencia y procesos sostenibles'
+      },
+      'Builder': {
+        emoji: '💚',
+        title: 'Constructor/a',
+        color: 'from-green-500 to-teal-500',
+        message: 'Eres hábil y motivado/a con dirección clara. La consistencia será tu superpoder — sigue presentándote y los resultados se acumularán.',
+        strengths: 'Habilidades fuertes, motivación clara',
+        growth: 'Construye hábitos consistentes y rastrea tu progreso'
+      },
+      'Dreamer': {
+        emoji: '🩵',
+        title: 'Soñador/a',
+        color: 'from-cyan-400 to-blue-400',
+        message: 'Estás lleno/a de pasión e ideas. Es momento de convertir esa inspiración en estructura. Comienza pequeño, desarrolla habilidades y crea prueba.',
+        strengths: 'Alta motivación, apasionado/a por tu tema',
+        growth: 'Desarrolla habilidades específicas y crea resultados tangibles'
+      },
+      'Seeker': {
+        emoji: '🧡',
+        title: 'Buscador/a',
+        color: 'from-orange-400 to-amber-400',
+        message: 'Eres expresivo/a y creativo/a con gran energía. Tu enfoque traerá claridad — elige una dirección y construye momentum allí.',
+        strengths: 'Personalidad fuerte, energía creativa',
+        growth: 'Enfoca tu energía y desarrolla habilidades centrales'
+      },
+      'Explorer': {
+        emoji: '💛',
+        title: 'Explorador/a',
+        color: 'from-yellow-400 to-amber-400',
+        message: 'Eres curioso/a y experimental, probando diferentes caminos. La claridad viene a través de la creación — elige algo y profundiza por 90 días.',
+        strengths: 'Mente abierta, dispuesto/a a experimentar',
+        growth: 'Comprométete con un camino y construye profundidad sobre amplitud'
+      }
+    }
+  };
+
+  const t = content[language];
+  const questionList = questions[language];
+
+  const isValidEmail = (email) => {
+    return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleAnswer = (value) => {
+    const newAnswers = { ...answers, [currentQuestion]: value };
+    setAnswers(newAnswers);
+
+    if (currentQuestion < questionList.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      calculateResults(newAnswers);
+    }
+  };
+
+  const calculateResults = (allAnswers) => {
+    let skillScore = 0;
+    let experienceScore = 0;
+    let personalityScore = 0;
+    let interestScore = 0;
+
+    questionList.forEach((q) => {
+      const answer = allAnswers[q.id];
+      const score = q.reverse ? (6 - answer) : answer;
+
+      if (q.section === 'skill') skillScore += score;
+      if (q.section === 'experience') experienceScore += score;
+      if (q.section === 'personality') personalityScore += score;
+      if (q.section === 'interest') interestScore += score;
+    });
+
+    const totalScore = skillScore + experienceScore + personalityScore + interestScore;
+    const normalizedScore = Math.round((totalScore / 120) * 100);
+
+    const calculatedScores = {
+      skill: skillScore,
+      experience: experienceScore,
+      personality: personalityScore,
+      interest: interestScore,
+      total: totalScore,
+      normalized: normalizedScore
+    };
+
+    setScores(calculatedScores);
+    setArchetype(determineArchetype(calculatedScores));
+    setScreen('optional');
+  };
+
+  const determineArchetype = (scores) => {
+    const { normalized, skill, experience, personality, interest } = scores;
+    let archetypeKey;
+
+    if (normalized >= 85) {
+      archetypeKey = 'Aligned Founder';
+    } else if (normalized >= 70) {
+      if (skill + personality + interest > experience * 2) {
+        archetypeKey = 'Visionary';
+      } else {
+        archetypeKey = 'Expert';
+      }
+    } else if (normalized >= 40) {
+      if (experience > skill && experience > personality) {
+        archetypeKey = 'Strategist';
+      } else if (skill + personality > interest + experience) {
+        archetypeKey = 'Artisan';
+      } else {
+        archetypeKey = 'Builder';
+      }
+    } else {
+      if (interest > skill + experience) {
+        archetypeKey = 'Dreamer';
+      } else if (personality > skill + experience) {
+        archetypeKey = 'Seeker';
+      } else {
+        archetypeKey = 'Explorer';
+      }
+    }
+
+    return archetypes[language][archetypeKey];
+  };
+
+  if (screen === 'welcome') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-sm font-medium text-gray-700"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'Español' : 'English'}
+            </button>
+          </div>
+
+          <div className="text-center mb-8">
+            <div className="inline-block bg-gradient-to-r from-purple-600 to-teal-500 text-white px-6 py-2 rounded-full text-sm font-semibold mb-6">
+              {t.welcome.badge}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              {t.welcome.title}
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              {t.welcome.subtitle}
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-50 to-teal-50 rounded-2xl p-6 mb-8">
+            <h2 className="font-semibold text-gray-900 mb-4 flex items-center">
+              <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
+              {t.welcome.whatYouGet}
+            </h2>
+            <ul className="space-y-3 text-gray-700">
+              {t.welcome.benefits.map((benefit, i) => (
+                <li key={i} className="flex items-start">
+                  <span className="text-teal-500 mr-2">✓</span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="text-center text-sm text-gray-500 mb-8">
+            ⏱️ {t.welcome.time}
+          </div>
+
+          <button
+            onClick={() => setScreen('quiz')}
+            className="w-full bg-gradient-to-r from-purple-600 to-teal-500 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+          >
+            {t.welcome.cta}
+            <ChevronRight className="ml-2 w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'quiz') {
+    const progress = ((currentQuestion + 1) / questionList.length) * 100;
+    const currentQ = questionList[currentQuestion];
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium text-white"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'ES' : 'EN'}
+            </button>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex justify-between text-white text-sm mb-2">
+              <span>{t.sections[currentQ.section]}</span>
+              <span>{currentQuestion + 1} {t.progressOf} {questionList.length}</span>
+            </div>
+            <div className="w-full bg-white/20 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-teal-400 to-purple-400 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 leading-relaxed">
+              {currentQ.text}
+            </h2>
+
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => handleAnswer(value)}
+                  className="w-full p-4 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 text-left group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-gray-700 group-hover:text-purple-700">
+                      {t.scale[value - 1]}
+                    </span>
+                    <span className="text-2xl text-gray-300 group-hover:text-purple-500">
+                      {value}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'optional') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium text-white"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'ES' : 'EN'}
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <div className="text-center mb-8">
+              <div className="inline-block bg-gradient-to-r from-purple-600 to-teal-500 text-white px-6 py-2 rounded-full text-sm font-semibold mb-4">
+                ✨ {t.optional.title}
+              </div>
+              <p className="text-gray-600 mb-6">{t.optional.subtitle}</p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  {t.optional.questions.industry.label}
+                </label>
+                <input
+                  type="text"
+                  placeholder={t.optional.questions.industry.placeholder}
+                  value={optionalAnswers.industry || ''}
+                  onChange={(e) => setOptionalAnswers({...optionalAnswers, industry: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  {t.optional.questions.challenge.label}
+                </label>
+                <select
+                  value={optionalAnswers.challenge || ''}
+                  onChange={(e) => setOptionalAnswers({...optionalAnswers, challenge: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none bg-white"
+                >
+                  <option value="">Select an option...</option>
+                  {t.optional.questions.challenge.options.map((option, i) => (
+                    <option key={i} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  {t.optional.questions.timeline.label}
+                </label>
+                <select
+                  value={optionalAnswers.timeline || ''}
+                  onChange={(e) => setOptionalAnswers({...optionalAnswers, timeline: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none bg-white"
+                >
+                  <option value="">Select an option...</option>
+                  {t.optional.questions.timeline.options.map((option, i) => (
+                    <option key={i} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">
+                  {t.optional.questions.stage.label}
+                </label>
+                <select
+                  value={optionalAnswers.stage || ''}
+                  onChange={(e) => setOptionalAnswers({...optionalAnswers, stage: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none bg-white"
+                >
+                  <option value="">Select an option...</option>
+                  {t.optional.questions.stage.options.map((option, i) => (
+                    <option key={i} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-4 mt-8">
+              <button
+                onClick={() => setScreen('results')}
+                className="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+              >
+                {t.optional.skip}
+              </button>
+              <button
+                onClick={() => setScreen('results')}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-teal-500 text-white py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300"
+              >
+                {t.optional.continue}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'results') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full space-y-6">
+          <div className="flex justify-end">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium text-white"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'ES' : 'EN'}
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center">
+            <div className="mb-6">
+              <div className="inline-block text-7xl mb-4 animate-bounce">
+                {archetype.emoji}
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                {t.results.youAre} {archetype.title}
+              </h2>
+              <div className={`inline-block bg-gradient-to-r ${archetype.color} text-white px-6 py-2 rounded-full text-lg font-semibold`}>
+                {t.results.score}: {scores.normalized}/100
+              </div>
+            </div>
+
+            <p className="text-xl text-gray-700 leading-relaxed mb-8">
+              {archetype.message}
+            </p>
+
+            {Object.keys(optionalAnswers).length > 0 && (
+              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 mb-8 text-left">
+                <h3 className="font-semibold text-purple-900 mb-4 flex items-center">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  {language === 'en' ? 'Your Personalized Insights' : 'Tus Insights Personalizados'}
+                </h3>
+                <div className="space-y-3 text-gray-700">
+                  {optionalAnswers.industry && (
+                    <p>
+                      <strong>{language === 'en' ? 'Industry:' : 'Industria:'}</strong> {optionalAnswers.industry}
+                    </p>
+                  )}
+                  {optionalAnswers.challenge && (
+                    <p>
+                      <strong>{language === 'en' ? 'Focus Area:' : 'Área de Enfoque:'}</strong> {optionalAnswers.challenge}
+                    </p>
+                  )}
+                  {optionalAnswers.timeline && (
+                    <p>
+                      <strong>{language === 'en' ? 'Timeline:' : 'Línea de Tiempo:'}</strong> {optionalAnswers.timeline}
+                    </p>
+                  )}
+                  {optionalAnswers.stage && (
+                    <p>
+                      <strong>{language === 'en' ? 'Current Stage:' : 'Etapa Actual:'}</strong> {optionalAnswers.stage}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-green-50 rounded-xl p-6 text-left">
+                <h3 className="font-semibold text-green-900 mb-2">{t.results.strengths}</h3>
+                <p className="text-green-800">{archetype.strengths}</p>
+              </div>
+              <div className="bg-amber-50 rounded-xl p-6 text-left">
+                <h3 className="font-semibold text-amber-900 mb-2">{t.results.growth}</h3>
+                <p className="text-amber-800">{archetype.growth}</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-teal-50 rounded-xl p-6">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 mr-2" />
+                {t.results.breakdown}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-purple-600">{Math.round((scores.skill/30)*100)}%</div>
+                  <div className="text-sm text-gray-600">{t.sections.skill.replace('💡 ', '')}</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-teal-600">{Math.round((scores.experience/30)*100)}%</div>
+                  <div className="text-sm text-gray-600">{t.sections.experience.replace('⚙️ ', '')}</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-amber-600">{Math.round((scores.personality/30)*100)}%</div>
+                  <div className="text-sm text-gray-600">{t.sections.personality.replace('💬 ', '')}</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-rose-600">{Math.round((scores.interest/30)*100)}%</div>
+                  <div className="text-sm text-gray-600">{t.sections.interest.replace('🔥 ', '')}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <div className="text-center mb-6">
+              <Mail className="w-12 h-12 mx-auto mb-4 text-purple-600" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                {t.results.emailTitle}
+              </h3>
+              <p className="text-gray-600">
+                {t.results.emailSubtitle}
+              </p>
+            </div>
+
+            <div className="max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder={t.results.emailPlaceholder}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none mb-4"
+                aria-invalid={!isValidEmail(email) && email.length > 0}
+              />
+              <button
+                disabled={!isValidEmail(email)}
+                onClick={() => alert(`${language === 'en' ? 'Your Niche Blueprint™ Report would be sent to:' : 'Tu Reporte Niche Blueprint™ se enviaría a:'} ${email}`)}
+                className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  isValidEmail(email)
+                    ? 'bg-gradient-to-r from-purple-600 to-teal-500 text-white hover:shadow-xl cursor-pointer'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {t.results.emailCta}
+              </button>
+              <p className="text-xs text-gray-500 text-center mt-3">
+                {t.results.privacy}
+              </p>
+            </div>
+
+            <div className="text-center mt-6">
+              <button
+                onClick={() => {
+                  setScreen('welcome');
+                  setAnswers({});
+                  setOptionalAnswers({});
+                  setCurrentQuestion(0);
+                  setScores(null);
+                  setArchetype(null);
+                  setEmail('');
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700 underline transition-colors"
+              >
+                {language === 'en' ? 'Retake Assessment' : 'Repetir Evaluación'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default NicheBlueprintAssessment;
