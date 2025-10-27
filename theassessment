@@ -1,0 +1,806 @@
+import React, { useState } from 'react';
+import { ChevronRight, Mail, BarChart3, Sparkles, Globe, CheckCircle } from 'lucide-react';
+
+const NicheBlueprintAssessment = () => {
+  const [screen, setScreen] = useState('welcome');
+  const [currentPart, setCurrentPart] = useState(1);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [part1Answers, setPart1Answers] = useState({});
+  const [part2Answers, setPart2Answers] = useState({});
+  const [part3Answers, setPart3Answers] = useState({});
+  const [email, setEmail] = useState('');
+  const [scores, setScores] = useState(null);
+  const [archetype, setArchetype] = useState(null);
+  const [language, setLanguage] = useState('en');
+
+  // Google Sheets Configuration
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNIOobi8DLDpK-IK4-1WqqSqhvwpPT_jIJpL-315vUFVFnPXW1Rkj0rCPRNrykzdoY/exec';
+
+  const content = {
+    en: {
+      welcome: {
+        badge: 'NICHE BLUEPRINT™',
+        title: 'Discover Your Founder-Market Fit',
+        subtitle: 'A science-backed assessment measuring your alignment across Passion, Expertise, and Market—with your personalized 7-Day Niche Roadmap.',
+        whatYouGet: "What You'll Get:",
+        benefits: [
+          'Your FMF Score (0-100) across 3 core domains',
+          'Your unique Founder Archetype (1 of 5)',
+          'Personalized 7-Day Niche Roadmap with daily actions'
+        ],
+        structure: 'Three-Part Assessment:',
+        parts: [
+          'Part 1: Core Assessment (24 questions)',
+          'Part 2: Business Deep Dive (8 questions)',
+          'Part 3: Optional Personalization (8 questions)'
+        ],
+        time: 'Takes about 8 minutes total',
+        cta: 'Start Part 1'
+      },
+      partComplete: {
+        part1: {
+          title: '✅ Part 1 Complete!',
+          message: 'Great start! You\'ve completed the core assessment. Now let\'s dive deeper into your business context.',
+          cta: 'Continue to Part 2'
+        },
+        part2: {
+          title: '✅ Part 2 Complete!',
+          message: 'Excellent! You\'re almost done. Part 3 is optional but will enhance your personalized roadmap.',
+          ctaContinue: 'Complete Part 3',
+          ctaSkip: 'Skip to Results'
+        }
+      },
+      domains: {
+        passion: '❤️ Passion',
+        expertise: '💎 Expertise',
+        market: '📈 Market'
+      },
+      scale: ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree'],
+      results: {
+        youAre: "You're",
+        yourScore: 'Your FMF Score',
+        domainBreakdown: 'Domain Breakdown',
+        yourRoadmap: 'Your 7-Day Niche Roadmap',
+        emailTitle: 'Get Your 7-Day Niche Roadmap',
+        emailSubtitle: 'Get your full roadmap and personalized results delivered to your inbox.',
+        emailPlaceholder: 'Enter your email',
+        emailCta: 'Get My 7-Day Roadmap',
+        privacy: 'We respect your privacy. Unsubscribe anytime.'
+      },
+      archetypes: {
+        innovator: {
+          title: 'The Innovator',
+          emoji: '💡',
+          color: 'from-yellow-500 to-orange-500',
+          description: 'You thrive on creating new solutions and pushing boundaries. Your roadmap focuses on rapid experimentation and turning ideas into action.',
+          focus: 'Innovation, experimentation, and bold moves'
+        },
+        authority: {
+          title: 'The Authority',
+          emoji: '👑',
+          color: 'from-purple-500 to-indigo-500',
+          description: 'You build credibility through expertise and proven results. Your roadmap focuses on establishing authority and attracting premium clients.',
+          focus: 'Credibility, thought leadership, and positioning'
+        },
+        visionary: {
+          title: 'The Visionary',
+          emoji: '🔮',
+          color: 'from-pink-500 to-purple-500',
+          description: 'You see the big picture and inspire others with your vision. Your roadmap focuses on clarifying your message and building a movement.',
+          focus: 'Vision, purpose, and inspiring action'
+        },
+        connector: {
+          title: 'The Connector',
+          emoji: '🤝',
+          color: 'from-blue-500 to-teal-500',
+          description: 'You excel at building relationships and bringing people together. Your roadmap focuses on community building and strategic partnerships.',
+          focus: 'Relationships, community, and collaboration'
+        },
+        stylist: {
+          title: 'The Stylist',
+          emoji: '✨',
+          color: 'from-rose-500 to-pink-500',
+          description: 'You create beautiful, compelling experiences that attract your ideal audience. Your roadmap focuses on brand presence and aesthetic impact.',
+          focus: 'Design, aesthetics, and brand experience'
+        }
+      },
+      progressOf: 'of'
+    },
+    es: {
+      welcome: {
+        badge: 'NICHE BLUEPRINT™',
+        title: 'Descubre tu Ajuste Fundador-Mercado',
+        subtitle: 'Una evaluación respaldada por ciencia que mide tu alineación en Pasión, Experiencia y Mercado—con tu hoja de ruta personalizada de 7 días.',
+        whatYouGet: 'Lo que obtendrás:',
+        benefits: [
+          'Tu Puntuación FMF (0-100) en 3 dominios principales',
+          'Tu Arquetipo de Fundador único (1 de 5)',
+          'Hoja de ruta personalizada de 7 días con acciones diarias'
+        ],
+        structure: 'Evaluación de Tres Partes:',
+        parts: [
+          'Parte 1: Evaluación Central (24 preguntas)',
+          'Parte 2: Análisis Profundo del Negocio (8 preguntas)',
+          'Parte 3: Personalización Opcional (8 preguntas)'
+        ],
+        time: 'Toma unos 8 minutos en total',
+        cta: 'Comenzar Parte 1'
+      },
+      partComplete: {
+        part1: {
+          title: '✅ ¡Parte 1 Completa!',
+          message: '¡Buen comienzo! Has completado la evaluación central. Ahora profundicemos en el contexto de tu negocio.',
+          cta: 'Continuar a Parte 2'
+        },
+        part2: {
+          title: '✅ ¡Parte 2 Completa!',
+          message: '¡Excelente! Ya casi terminas. La Parte 3 es opcional pero mejorará tu hoja de ruta personalizada.',
+          ctaContinue: 'Completar Parte 3',
+          ctaSkip: 'Saltar a Resultados'
+        }
+      },
+      domains: {
+        passion: '❤️ Pasión',
+        expertise: '💎 Experiencia',
+        market: '📈 Mercado'
+      },
+      scale: ['Totalmente en desacuerdo', 'En desacuerdo', 'Neutral', 'De acuerdo', 'Totalmente de acuerdo'],
+      results: {
+        youAre: 'Eres',
+        yourScore: 'Tu Puntuación FMF',
+        domainBreakdown: 'Desglose de Dominios',
+        yourRoadmap: 'Tu Hoja de Ruta de 7 Días',
+        emailTitle: 'Obtén tu Hoja de Ruta de 7 Días',
+        emailSubtitle: 'Recibe tu hoja de ruta completa y resultados personalizados en tu bandeja de entrada.',
+        emailPlaceholder: 'Ingresa tu correo electrónico',
+        emailCta: 'Obtener Mi Hoja de Ruta de 7 Días',
+        privacy: 'Respetamos tu privacidad. Cancela en cualquier momento.'
+      },
+      archetypes: {
+        innovator: {
+          title: 'El/La Innovador/a',
+          emoji: '💡',
+          color: 'from-yellow-500 to-orange-500',
+          description: 'Prosperas creando nuevas soluciones y empujando límites. Tu hoja de ruta se enfoca en experimentación rápida y convertir ideas en acción.',
+          focus: 'Innovación, experimentación y movimientos audaces'
+        },
+        authority: {
+          title: 'La Autoridad',
+          emoji: '👑',
+          color: 'from-purple-500 to-indigo-500',
+          description: 'Construyes credibilidad a través de experiencia y resultados comprobados. Tu hoja de ruta se enfoca en establecer autoridad y atraer clientes premium.',
+          focus: 'Credibilidad, liderazgo de pensamiento y posicionamiento'
+        },
+        visionary: {
+          title: 'El/La Visionario/a',
+          emoji: '🔮',
+          color: 'from-pink-500 to-purple-500',
+          description: 'Ves el panorama completo e inspiras a otros con tu visión. Tu hoja de ruta se enfoca en aclarar tu mensaje y construir un movimiento.',
+          focus: 'Visión, propósito e inspirar acción'
+        },
+        connector: {
+          title: 'El/La Conector/a',
+          emoji: '🤝',
+          color: 'from-blue-500 to-teal-500',
+          description: 'Sobresales construyendo relaciones y uniendo personas. Tu hoja de ruta se enfoca en construcción de comunidad y asociaciones estratégicas.',
+          focus: 'Relaciones, comunidad y colaboración'
+        },
+        stylist: {
+          title: 'El/La Estilista',
+          emoji: '✨',
+          color: 'from-rose-500 to-pink-500',
+          description: 'Creas experiencias hermosas y convincentes que atraen a tu audiencia ideal. Tu hoja de ruta se enfoca en presencia de marca e impacto estético.',
+          focus: 'Diseño, estética y experiencia de marca'
+        }
+      },
+      progressOf: 'de'
+    }
+  };
+
+  const questions = {
+    en: {
+      part1: [
+        // PASSION (0-7)
+        { id: 0, domain: 'passion', text: 'I feel genuinely excited about the problems I want to solve.', reverse: false },
+        { id: 1, domain: 'passion', text: 'I can see myself working in this niche for years to come.', reverse: false },
+        { id: 2, domain: 'passion', text: 'My work feels deeply connected to my values and purpose.', reverse: false },
+        { id: 3, domain: 'passion', text: 'I stay motivated even when progress is slow or challenging.', reverse: false },
+        { id: 4, domain: 'passion', text: 'I research my niche just for fun, not just for work.', reverse: false },
+        { id: 5, domain: 'passion', text: 'I constantly think about new ideas and opportunities in my space.', reverse: false },
+        { id: 6, domain: 'passion', text: 'I feel aligned with the type of people I want to serve.', reverse: false },
+        { id: 7, domain: 'passion', text: 'My interest fades quickly when I face obstacles.', reverse: true },
+        
+        // EXPERTISE (8-15)
+        { id: 8, domain: 'expertise', text: 'I have skills or knowledge that others would pay for.', reverse: false },
+        { id: 9, domain: 'expertise', text: 'I can clearly explain what makes me different or valuable.', reverse: false },
+        { id: 10, domain: 'expertise', text: "I've created work or results I'm proud to showcase.", reverse: false },
+        { id: 11, domain: 'expertise', text: "I've been actively building in my field for 6+ months.", reverse: false },
+        { id: 12, domain: 'expertise', text: 'People have given me positive feedback or testimonials.', reverse: false },
+        { id: 13, domain: 'expertise', text: 'I can demonstrate proof of my expertise through examples.', reverse: false },
+        { id: 14, domain: 'expertise', text: 'I apply what I learn in real projects consistently.', reverse: false },
+        { id: 15, domain: 'expertise', text: 'I often doubt whether my skills are good enough.', reverse: true },
+        
+        // MARKET (16-23)
+        { id: 16, domain: 'market', text: 'I have a clear idea of who my ideal customer or client is.', reverse: false },
+        { id: 17, domain: 'market', text: 'I know what specific problems my audience is willing to pay to solve.', reverse: false },
+        { id: 18, domain: 'market', text: 'There is clear demand for what I offer or want to create.', reverse: false },
+        { id: 19, domain: 'market', text: 'I understand how my audience currently tries to solve their problems.', reverse: false },
+        { id: 20, domain: 'market', text: 'I have validated my ideas by talking to potential customers.', reverse: false },
+        { id: 21, domain: 'market', text: 'I know where my ideal audience spends their time online.', reverse: false },
+        { id: 22, domain: 'market', text: 'I have a clear path to monetize my knowledge or services.', reverse: false },
+        { id: 23, domain: 'market', text: "I'm not sure if people will actually pay for what I offer.", reverse: true },
+      ],
+      part2: [
+        // PART 2: Business Deep Dive (8 required questions)
+        { id: 0, text: 'I have a clear business model for how I will make money.', reverse: false },
+        { id: 1, text: 'I know exactly what my first (or next) offer will be.', reverse: false },
+        { id: 2, text: 'I have a defined process for delivering my service or product.', reverse: false },
+        { id: 3, text: 'I understand my competitive landscape and what makes me unique.', reverse: false },
+        { id: 4, text: 'I have systems in place to manage my business operations.', reverse: false },
+        { id: 5, text: 'I know how to price my offerings appropriately.', reverse: false },
+        { id: 6, text: 'I have a strategy for acquiring new clients or customers.', reverse: false },
+        { id: 7, text: 'I feel overwhelmed by the business side of things.', reverse: true },
+      ],
+      part3: [
+        // PART 3: Optional Personalization (8 optional questions)
+        { id: 0, text: 'I have a clear content strategy for building my audience.', reverse: false },
+        { id: 1, text: 'I consistently show up online and engage with my audience.', reverse: false },
+        { id: 2, text: 'I have email marketing or lead generation systems in place.', reverse: false },
+        { id: 3, text: 'I track key metrics and data about my business performance.', reverse: false },
+        { id: 4, text: 'I have a supportive network or community of peers.', reverse: false },
+        { id: 5, text: 'I invest time in learning and skill development regularly.', reverse: false },
+        { id: 6, text: 'I have clear boundaries between work and personal life.', reverse: false },
+        { id: 7, text: 'I struggle with staying organized and managing my time.', reverse: true },
+      ]
+    },
+    es: {
+      part1: [
+        // PASIÓN (0-7)
+        { id: 0, domain: 'passion', text: 'Me siento genuinamente emocionado/a por los problemas que quiero resolver.', reverse: false },
+        { id: 1, domain: 'passion', text: 'Puedo verme trabajando en este nicho durante años.', reverse: false },
+        { id: 2, domain: 'passion', text: 'Mi trabajo se siente profundamente conectado con mis valores y propósito.', reverse: false },
+        { id: 3, domain: 'passion', text: 'Me mantengo motivado/a incluso cuando el progreso es lento o desafiante.', reverse: false },
+        { id: 4, domain: 'passion', text: 'Investigo mi nicho solo por diversión, no solo por trabajo.', reverse: false },
+        { id: 5, domain: 'passion', text: 'Constantemente pienso en nuevas ideas y oportunidades en mi espacio.', reverse: false },
+        { id: 6, domain: 'passion', text: 'Me siento alineado/a con el tipo de personas que quiero servir.', reverse: false },
+        { id: 7, domain: 'passion', text: 'Mi interés disminuye rápidamente cuando enfrento obstáculos.', reverse: true },
+        
+        // EXPERIENCIA (8-15)
+        { id: 8, domain: 'expertise', text: 'Tengo habilidades o conocimientos por los que otros pagarían.', reverse: false },
+        { id: 9, domain: 'expertise', text: 'Puedo explicar claramente qué me hace diferente o valioso/a.', reverse: false },
+        { id: 10, domain: 'expertise', text: 'He creado trabajo o resultados de los que estoy orgulloso/a de mostrar.', reverse: false },
+        { id: 11, domain: 'expertise', text: 'He estado construyendo activamente en mi campo por más de 6 meses.', reverse: false },
+        { id: 12, domain: 'expertise', text: 'Las personas me han dado retroalimentación positiva o testimonios.', reverse: false },
+        { id: 13, domain: 'expertise', text: 'Puedo demostrar prueba de mi experiencia a través de ejemplos.', reverse: false },
+        { id: 14, domain: 'expertise', text: 'Aplico lo que aprendo en proyectos reales de manera consistente.', reverse: false },
+        { id: 15, domain: 'expertise', text: 'A menudo dudo si mis habilidades son suficientemente buenas.', reverse: true },
+        
+        // MERCADO (16-23)
+        { id: 16, domain: 'market', text: 'Tengo una idea clara de quién es mi cliente o clienta ideal.', reverse: false },
+        { id: 17, domain: 'market', text: 'Sé qué problemas específicos mi audiencia está dispuesta a pagar por resolver.', reverse: false },
+        { id: 18, domain: 'market', text: 'Hay demanda clara para lo que ofrezco o quiero crear.', reverse: false },
+        { id: 19, domain: 'market', text: 'Entiendo cómo mi audiencia intenta actualmente resolver sus problemas.', reverse: false },
+        { id: 20, domain: 'market', text: 'He validado mis ideas hablando con clientes potenciales.', reverse: false },
+        { id: 21, domain: 'market', text: 'Sé dónde pasa su tiempo en línea mi audiencia ideal.', reverse: false },
+        { id: 22, domain: 'market', text: 'Tengo un camino claro para monetizar mi conocimiento o servicios.', reverse: false },
+        { id: 23, domain: 'market', text: 'No estoy seguro/a si las personas realmente pagarán por lo que ofrezco.', reverse: true },
+      ],
+      part2: [
+        { id: 0, text: 'Tengo un modelo de negocio claro sobre cómo ganaré dinero.', reverse: false },
+        { id: 1, text: 'Sé exactamente cuál será mi primera (o próxima) oferta.', reverse: false },
+        { id: 2, text: 'Tengo un proceso definido para entregar mi servicio o producto.', reverse: false },
+        { id: 3, text: 'Entiendo mi panorama competitivo y qué me hace único/a.', reverse: false },
+        { id: 4, text: 'Tengo sistemas en marcha para gestionar las operaciones de mi negocio.', reverse: false },
+        { id: 5, text: 'Sé cómo fijar el precio apropiado de mis ofertas.', reverse: false },
+        { id: 6, text: 'Tengo una estrategia para adquirir nuevos clientes o clientas.', reverse: false },
+        { id: 7, text: 'Me siento abrumado/a por el lado comercial de las cosas.', reverse: true },
+      ],
+      part3: [
+        { id: 0, text: 'Tengo una estrategia de contenido clara para construir mi audiencia.', reverse: false },
+        { id: 1, text: 'Me presento consistentemente en línea e interactúo con mi audiencia.', reverse: false },
+        { id: 2, text: 'Tengo sistemas de marketing por correo o generación de leads.', reverse: false },
+        { id: 3, text: 'Rastro métricas clave y datos sobre el rendimiento de mi negocio.', reverse: false },
+        { id: 4, text: 'Tengo una red de apoyo o comunidad de pares.', reverse: false },
+        { id: 5, text: 'Invierto tiempo en aprendizaje y desarrollo de habilidades regularmente.', reverse: false },
+        { id: 6, text: 'Tengo límites claros entre el trabajo y la vida personal.', reverse: false },
+        { id: 7, text: 'Lucho con mantenerme organizado/a y gestionar mi tiempo.', reverse: true },
+      ]
+    }
+  };
+
+  const t = content[language];
+  
+  const getCurrentQuestions = () => {
+    const lang = questions[language];
+    if (currentPart === 1) return lang.part1;
+    if (currentPart === 2) return lang.part2;
+    return lang.part3;
+  };
+
+  const getCurrentAnswers = () => {
+    if (currentPart === 1) return part1Answers;
+    if (currentPart === 2) return part2Answers;
+    return part3Answers;
+  };
+
+  const setCurrentAnswers = (answers) => {
+    if (currentPart === 1) setPart1Answers(answers);
+    else if (currentPart === 2) setPart2Answers(answers);
+    else setPart3Answers(answers);
+  };
+
+  const isValidEmail = (email) => {
+    return email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!isValidEmail(email)) {
+      alert(language === 'en' ? 'Please enter a valid email address.' : 'Por favor ingresa un correo electrónico válido.');
+      return;
+    }
+
+    try {
+      // Show loading state
+      console.log('Submitting to Google Sheets...');
+      
+      // Prepare data for Google Sheets
+      const formData = new URLSearchParams();
+      formData.append('Email', email);
+      formData.append('Archetype', archetype);
+      formData.append('FMFScore', scores.overall);
+      formData.append('PassionScore', scores.passion);
+      formData.append('ExpertiseScore', scores.expertise);
+      formData.append('MarketScore', scores.market);
+      formData.append('Part2Complete', Object.keys(part2Answers).length > 0 ? 'Yes' : 'No');
+      formData.append('Part3Complete', Object.keys(part3Answers).length > 0 ? 'Yes' : 'No');
+
+      console.log('Data prepared:', Object.fromEntries(formData));
+
+      // Send to Google Sheets
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData
+      });
+
+      console.log('Request sent');
+
+      // With no-cors mode, we can't check response status, so assume success
+      alert(language === 'en' 
+        ? '✅ Success! Check your email for your 7-Day Roadmap (arrives within 1-2 minutes).\n\nAlso check your Google Sheet to confirm the data was received!' 
+        : '✅ ¡Éxito! Revisa tu correo para tu Hoja de Ruta de 7 Días (llega en 1-2 minutos).\n\n¡También revisa tu Google Sheet para confirmar que se recibieron los datos!');
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert(language === 'en'
+        ? `Error: ${error.message}\n\nPlease email us at: cecilia.s@efcompliance.com`
+        : `Error: ${error.message}\n\nPor favor envíanos un correo a: cecilia.s@efcompliance.com`);
+    }
+  };
+
+  const handleAnswer = (value) => {
+    const currentAnswers = getCurrentAnswers();
+    const newAnswers = { ...currentAnswers, [currentQuestion]: value };
+    setCurrentAnswers(newAnswers);
+
+    const questionList = getCurrentQuestions();
+    if (currentQuestion < questionList.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      // Part complete
+      if (currentPart === 1) {
+        setScreen('part1Complete');
+      } else if (currentPart === 2) {
+        setScreen('part2Complete');
+      } else {
+        calculateResults();
+      }
+    }
+  };
+
+  const continueToPart2 = () => {
+    setCurrentPart(2);
+    setCurrentQuestion(0);
+    setScreen('quiz');
+  };
+
+  const continueToPart3 = () => {
+    setCurrentPart(3);
+    setCurrentQuestion(0);
+    setScreen('quiz');
+  };
+
+  const skipToPart3Results = () => {
+    calculateResults();
+  };
+
+  const calculateResults = () => {
+    let passionScore = 0;
+    let expertiseScore = 0;
+    let marketScore = 0;
+
+    const part1List = questions[language].part1;
+    part1List.forEach((q) => {
+      const answer = part1Answers[q.id];
+      if (answer) {
+        const score = q.reverse ? (6 - answer) : answer;
+        if (q.domain === 'passion') passionScore += score;
+        if (q.domain === 'expertise') expertiseScore += score;
+        if (q.domain === 'market') marketScore += score;
+      }
+    });
+
+    const normalizedPassion = Math.round((passionScore / 40) * 100);
+    const normalizedExpertise = Math.round((expertiseScore / 40) * 100);
+    const normalizedMarket = Math.round((marketScore / 40) * 100);
+    const overallFMF = Math.round((normalizedPassion + normalizedExpertise + normalizedMarket) / 3);
+
+    const calculatedScores = {
+      passion: normalizedPassion,
+      expertise: normalizedExpertise,
+      market: normalizedMarket,
+      overall: overallFMF
+    };
+
+    setScores(calculatedScores);
+    setArchetype(determineArchetype(calculatedScores));
+    setScreen('results');
+  };
+
+  const determineArchetype = (scores) => {
+    const { passion, expertise, market } = scores;
+    
+    if (passion >= 70 && market >= 70) {
+      return 'innovator';
+    }
+    
+    if (expertise >= 75) {
+      return 'authority';
+    }
+    
+    if (passion >= 80) {
+      return 'visionary';
+    }
+    
+    if (Math.min(passion, expertise, market) >= 60 && Math.max(passion, expertise, market) - Math.min(passion, expertise, market) <= 20) {
+      return 'connector';
+    }
+    
+    return 'stylist';
+  };
+
+  if (screen === 'welcome') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-sm font-medium text-gray-700"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'Español' : 'English'}
+            </button>
+          </div>
+
+          <div className="text-center mb-8">
+            <div className="inline-block bg-gradient-to-r from-purple-600 to-teal-500 text-white px-6 py-2 rounded-full text-sm font-semibold mb-6">
+              {t.welcome.badge}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              {t.welcome.title}
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              {t.welcome.subtitle}
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-50 to-teal-50 rounded-2xl p-6 mb-6">
+            <h2 className="font-semibold text-gray-900 mb-4 flex items-center">
+              <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
+              {t.welcome.whatYouGet}
+            </h2>
+            <ul className="space-y-3 text-gray-700">
+              {t.welcome.benefits.map((benefit, i) => (
+                <li key={i} className="flex items-start">
+                  <span className="text-teal-500 mr-2">✓</span>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 mb-8">
+            <h2 className="font-semibold text-gray-900 mb-4">
+              {t.welcome.structure}
+            </h2>
+            <ul className="space-y-2 text-gray-700">
+              {t.welcome.parts.map((part, i) => (
+                <li key={i} className="flex items-start">
+                  <span className="text-purple-600 mr-2 font-bold">{i + 1}.</span>
+                  <span>{part}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="text-center text-sm text-gray-500 mb-8">
+            ⏱️ {t.welcome.time}
+          </div>
+
+          <button
+            onClick={() => setScreen('quiz')}
+            className="w-full bg-gradient-to-r from-purple-600 to-teal-500 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+          >
+            {t.welcome.cta}
+            <ChevronRight className="ml-2 w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'part1Complete') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center">
+          <div className="text-6xl mb-6">
+            <CheckCircle className="w-24 h-24 text-green-500 mx-auto" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            {t.partComplete.part1.title}
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            {t.partComplete.part1.message}
+          </p>
+          <div className="flex justify-center gap-2 mb-8">
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+          </div>
+          <button
+            onClick={continueToPart2}
+            className="w-full bg-gradient-to-r from-purple-600 to-teal-500 text-white py-4 rounded-xl font-semibold text-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+          >
+            {t.partComplete.part1.cta}
+            <ChevronRight className="ml-2 w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'part2Complete') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center">
+          <div className="text-6xl mb-6">
+            <CheckCircle className="w-24 h-24 text-green-500 mx-auto" />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            {t.partComplete.part2.title}
+          </h2>
+          <p className="text-xl text-gray-600 mb-8">
+            {t.partComplete.part2.message}
+          </p>
+          <div className="flex justify-center gap-2 mb-8">
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+          </div>
+          <div className="flex gap-4">
+            <button
+              onClick={skipToPart3Results}
+              className="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+            >
+              {t.partComplete.part2.ctaSkip}
+            </button>
+            <button
+              onClick={continueToPart3}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-teal-500 text-white py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+            >
+              {t.partComplete.part2.ctaContinue}
+              <ChevronRight className="ml-2 w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'quiz') {
+    const questionList = getCurrentQuestions();
+    const progress = ((currentQuestion + 1) / questionList.length) * 100;
+    const currentQ = questionList[currentQuestion];
+    const partLabel = `Part ${currentPart}`;
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full">
+          <div className="flex justify-between items-center mb-4">
+            <div className="text-white text-sm font-semibold">
+              {partLabel}
+            </div>
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium text-white"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'ES' : 'EN'}
+            </button>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex justify-between text-white text-sm mb-2">
+              <span>{currentPart === 1 ? t.domains[currentQ.domain] : partLabel}</span>
+              <span>{currentQuestion + 1} {t.progressOf} {questionList.length}</span>
+            </div>
+            <div className="w-full bg-white/20 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-teal-400 to-purple-400 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 leading-relaxed">
+              {currentQ.text}
+            </h2>
+
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => handleAnswer(value)}
+                  className="w-full p-4 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:bg-purple-50 transition-all duration-200 text-left group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-gray-700 group-hover:text-purple-700">
+                      {t.scale[value - 1]}
+                    </span>
+                    <span className="text-2xl text-gray-300 group-hover:text-purple-500">
+                      {value}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'results') {
+    const archetypeData = t.archetypes[archetype];
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-purple-800 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full space-y-6">
+          <div className="flex justify-end">
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors text-sm font-medium text-white"
+            >
+              <Globe className="w-4 h-4" />
+              {language === 'en' ? 'ES' : 'EN'}
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center">
+            <div className="mb-6">
+              <div className={`inline-block text-7xl mb-4 animate-bounce`}>
+                {archetypeData.emoji}
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                {t.results.youAre} {archetypeData.title}
+              </h2>
+              <div className={`inline-block bg-gradient-to-r ${archetypeData.color} text-white px-6 py-2 rounded-full text-lg font-semibold`}>
+                {t.results.yourScore}: {scores.overall}/100
+              </div>
+            </div>
+
+            <p className="text-xl text-gray-700 leading-relaxed mb-8">
+              {archetypeData.description}
+            </p>
+
+            <div className="bg-gradient-to-br from-purple-50 to-teal-50 rounded-2xl p-6 mb-8">
+              <h3 className="font-semibold text-gray-900 mb-2">
+                {language === 'en' ? 'Your Focus:' : 'Tu Enfoque:'}
+              </h3>
+              <p className="text-gray-700">{archetypeData.focus}</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-teal-50 rounded-2xl p-6">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 mr-2" />
+                {t.results.domainBreakdown}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-3xl mb-2">❤️</div>
+                  <div className="text-2xl font-bold text-rose-600">{scores.passion}%</div>
+                  <div className="text-sm text-gray-600">{t.domains.passion.replace('❤️ ', '')}</div>
+                </div>
+                <div>
+                  <div className="text-3xl mb-2">💎</div>
+                  <div className="text-2xl font-bold text-blue-600">{scores.expertise}%</div>
+                  <div className="text-sm text-gray-600">{t.domains.expertise.replace('💎 ', '')}</div>
+                </div>
+                <div>
+                  <div className="text-3xl mb-2">📈</div>
+                  <div className="text-2xl font-bold text-green-600">{scores.market}%</div>
+                  <div className="text-sm text-gray-600">{t.domains.market.replace('📈 ', '')}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+            <div className="text-center mb-6">
+              <Mail className="w-12 h-12 mx-auto mb-4 text-purple-600" />
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                {t.results.emailTitle}
+              </h3>
+              <p className="text-gray-600">
+                {t.results.emailSubtitle}
+              </p>
+            </div>
+
+            <div className="max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder={t.results.emailPlaceholder}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:outline-none mb-4"
+                aria-invalid={!isValidEmail(email) && email.length > 0}
+              />
+              <button
+                disabled={!isValidEmail(email)}
+                onClick={handleEmailSubmit}
+                className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  isValidEmail(email)
+                    ? 'bg-gradient-to-r from-purple-600 to-teal-500 text-white hover:shadow-xl cursor-pointer'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {t.results.emailCta}
+              </button>
+              <p className="text-xs text-gray-500 text-center mt-3">
+                {t.results.privacy}
+              </p>
+            </div>
+
+            <div className="text-center mt-6">
+              <button
+                onClick={() => {
+                  setScreen('welcome');
+                  setPart1Answers({});
+                  setPart2Answers({});
+                  setPart3Answers({});
+                  setCurrentPart(1);
+                  setCurrentQuestion(0);
+                  setScores(null);
+                  setArchetype(null);
+                  setEmail('');
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700 underline transition-colors"
+              >
+                {language === 'en' ? 'Retake Assessment' : 'Repetir Evaluación'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default NicheBlueprintAssessment;
